@@ -1,10 +1,10 @@
-from logging import getLogger, basicConfig, DEBUG, ERROR, INFO, FileHandler, StreamHandler
+import argparse  # arg parser
+from logging import getLogger, basicConfig, DEBUG, INFO, StreamHandler
+
+import pyfiglet  # Banner
 
 import copy_files.copying_files
-import pyfiglet  # Banner
-import argparse  # arg parser
 import envir.environment_dirs
-
 
 #Dev
 
@@ -19,8 +19,8 @@ FORMAT = '%(asctime)s : %(name)s : %(levelname)s : %(message)s\n\r'
 # file_handler = FileHandler('test.log')
 # file_handler.setLevel(DEBUG)
 console = StreamHandler()
-console.setLevel(DEBUG)
-basicConfig(level=DEBUG, format=FORMAT, handlers=[console])
+console.setLevel(INFO)
+basicConfig(level=INFO, format=FORMAT, handlers=[console])
 # ------------------------------
 
 # Press the green button in the gutter to run the script.
@@ -41,11 +41,7 @@ if __name__ == '__main__':
     #---------------- end parsing arguments -----------------
 
 
-
     copy_files.copying_files.copy_date_month(args.month, envir.environment_dirs.path_source(), envir.environment_dirs.path_destination(), args.year_backup)
-
-
-
 
 
     logger.info("Service BACKUPER NG stopped")

@@ -1,5 +1,5 @@
 import os
-from logging import getLogger, basicConfig, DEBUG, ERROR, INFO, FileHandler, StreamHandler
+from logging import getLogger
 
 logger = getLogger(__name__)
 

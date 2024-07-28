@@ -1,13 +1,13 @@
 # Backup NAS
+import argparse  # arg parser
 import os
 import re
 import subprocess
 from datetime import datetime
 
-# from shlex import quote
-
 import pyfiglet  # Banner
-import argparse  # arg parser
+
+# from shlex import quote
 
 if "__name__" == "__main__":
 
