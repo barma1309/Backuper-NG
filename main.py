@@ -1,8 +1,10 @@
 from logging import getLogger, basicConfig, DEBUG, ERROR, INFO, FileHandler, StreamHandler
+
+import copy_files.copying_files
 import pyfiglet  # Banner
 import argparse  # arg parser
 import envir.environment_dirs
-import copy_files.copying_files
+
 
 #Dev
 
@@ -40,7 +42,7 @@ if __name__ == '__main__':
 
 
 
-    copy_date_month(args.month, ftp_dir, long_storage, args.year_backup)
+    copy_files.copying_files.copy_date_month(args.month, envir.environment_dirs.path_source(), envir.environment_dirs.path_destination(), args.year_backup)
 
 
 

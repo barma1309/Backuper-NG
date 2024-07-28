@@ -21,8 +21,8 @@ def copy_date_month(month: str, src_dir: str, dst_dir: str, year_backup: datetim
 
     month_dst_dir = dst_dir + str(key_year) + '/' + str(month)
 
-    logger.info("Destination path is:{month_dst_dir}")
-    logger.info(f'\n * Checking destination path....')
+    logger.info(f'Destination path is:{month_dst_dir} \n')
+    logger.info(f'* Checking destination path.... \n')
 
     if not os.path.exists(dst_dir):
         #print(f'\n * Creating destination path: {month_dst_dir} ...')
