@@ -1,49 +1,67 @@
-import argparse  # arg parser
-from logging import getLogger, basicConfig, DEBUG, INFO, StreamHandler
-
-import pyfiglet  # Banner
-
+import argparse
+from logging import getLogger, basicConfig, INFO, StreamHandler
+import pyfiglet
 import copy_files.copying_files
 import envir.environment_dirs
 
-#Dev
+# Constants
+LOG_FORMAT = '%(asctime)s : %(name)s : %(levelname)s : %(message)s\n\r'
+BANNER_TEXT = "BaCKuPER NG 4.11.0"
 
-# This is a sample Python script.
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
-# -------------LOGGING ----------
+def initialize_logging():
+    """
+    Initializes and configures the logging framework for console output.
 
-logger = getLogger()
-FORMAT = '%(asctime)s : %(name)s : %(levelname)s : %(message)s\n\r'
-# file_handler = FileHandler('test.log')
-# file_handler.setLevel(DEBUG)
-console = StreamHandler()
-console.setLevel(INFO)
-basicConfig(level=INFO, format=FORMAT, handlers=[console])
-# ------------------------------
+    This function sets up a basic logger with a stream handler configured
+    to output logging messages to the console. The logging level and
+    message format are configured as specified in the function.
 
-# Press the green button in the gutter to run the script.
+    Returns
+    -------
+    Logger
+        An instance of the configured logger.
+    """
+    logger = getLogger()
+    console = StreamHandler()
+    console.setLevel(INFO)
+    basicConfig(level=INFO, format=LOG_FORMAT, handlers=[console])
+    return logger
+
+
+def print_banner():
+    """Prints the ASCII banner."""
+    banner = pyfiglet.figlet_format(BANNER_TEXT)
+    print(banner)
+
+
+def parse_arguments():
+    """Parses command-line arguments."""
+    parser = argparse.ArgumentParser(description="Parser for backup files")
+    parser.add_argument("-y", "--year", help="Year to parse the directory", type=int, required=True)
+    parser.add_argument("-m", "--month", help="Month to parse the directory", type=int, required=True)
+    parser.add_argument("-d", "--debug", help="Debug mode - input 1 for debug", type=int, required=False)
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
-    # Logo Banner
-    ascii_banner = pyfiglet.figlet_format("BaCKuPER NG 4.00")
-    print(ascii_banner)
-    logger.info("Service BACKUPER NG started ")
+    # Initialize logging and logger
+    logger = initialize_logging()
 
+    # Print banner
+    print_banner()
+
+    logger.info("Service BACKUPER NG started")
+
+    # Detect OS environment
     envir.environment_dirs.os_detect()
 
-    #--------------- parsing arguments ----------------------
-    parser = argparse.ArgumentParser(description="Parser backup files")
-    parser.add_argument("-y", dest="year_backup", help="date(year) which directory will parse", type=int, required=True)
-    parser.add_argument("-m", dest="month", help="date(month) which directory will parse", type=int, required=True)
-    parser.add_argument("-d", dest="debug", help="debug mode - input 1 for debug", type=int, required=False)
-    args = parser.parse_args()
-    #---------------- end parsing arguments -----------------
+    # Parse arguments
+    args = parse_arguments()
 
-
-    copy_files.copying_files.copy_date_month(args.month, envir.environment_dirs.path_source(), envir.environment_dirs.path_destination(), args.year_backup)
-
+    # Execute file copying
+    source = envir.environment_dirs.path_source()
+    destination = envir.environment_dirs.path_destination()
+    copy_files.copying_files.copy_date_month(args.month, source, destination, args.year)
 
     logger.info("Service BACKUPER NG stopped")
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
