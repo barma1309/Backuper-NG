@@ -8,7 +8,7 @@ logger = getLogger(__name__)
 # Constants
 KEY_TIME = '00'
 KEY_DATE_VALUES = ('01', '04', '05', '09', '10', '14', '15', '19', '20', '24', '25', '28')
-RSYNC_CMD_TEMPLATE = 'rsync -zvh --remove-source-files --progress {src_file} {dst_path}'
+RSYNC_CMD_TEMPLATE = 'rsync -zvh --progress {src_file} {dst_path}'
 
 
 def ensure_directory_exists(directory: str):
@@ -57,6 +57,18 @@ def find_matching_files(src_dir: str, key_year: str, month: str) -> list[str]:
                     break  # Exit after finding a match for this file
     return matching_files
 
+def run_command(command):
+    command_list = command.split()
+
+    try:
+        result = subprocess.run(command_list, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return result.stdout
+
+    except subprocess.CalledProcessError as e:
+        print(f'ERROR executing command: {e.stderr}')
+        return None
+
+
 
 def execute_rsync(src_file: str, dst_dir: str, key_year: str, month: str):
     """
@@ -77,10 +89,18 @@ def execute_rsync(src_file: str, dst_dir: str, key_year: str, month: str):
     """
     # Escape problematic characters
     escaped_file = src_file.replace("(", r"\(").replace(")", r"\)")
-    dst_path = os.path.join(str(dst_dir), str(key_year), str(month))
-    cmd = RSYNC_CMD_TEMPLATE.format(src_file=str(escaped_file), dst_path=str(dst_path))
+    dst_path = os.path.join(dst_dir, key_year, month)
+    cmd = RSYNC_CMD_TEMPLATE.format(src_file=escaped_file, dst_path=dst_path)
+
     logger.info(cmd)
-    subprocess.run([cmd], shell=True)
+
+    output = run_command(cmd)
+
+    if output:
+        print("Command output:")
+        print(output)
+
+    #subprocess.run([cmd], shell=True)
 
 
 def copy_date_month(month: str, src_dir: str, dst_dir: str, key_year: str):
