@@ -106,9 +106,7 @@ def execute_rsync(src_file: str, dst_dir: str, key_year: str, month: str):
         print("Command output:")
         print(output)
 
-    #subprocess.run([cmd], shell=True)
-
-
+ 
 def copy_date_month(month: str, src_dir: str, dst_dir: str, key_year: str):
     """
     Copy files matching specific patterns from the source directory to the destination directory.
