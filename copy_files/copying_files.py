@@ -58,20 +58,14 @@ def find_matching_files(src_dir: str, key_year: str, month: str) -> list[str]:
     return matching_files
 
 
-
-
-
 def run_command(command):
-    #command_list = command.split()
-
     try:
         result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         return result.stdout
 
     except subprocess.CalledProcessError as e:
-        print(f'ERROR executing command: {e.stderr}')
+        logger.error('Command failed: %s', e.stderr.strip() or e)
         return None
-
 
 
 def execute_rsync(src_file: str, dst_dir: str, key_year: str, month: str):
@@ -91,22 +85,18 @@ def execute_rsync(src_file: str, dst_dir: str, key_year: str, month: str):
     Returns:
         None
     """
-    # Escape problematic characters
-    #escaped_file = src_file.replace("(", r"\(").replace(")", r"\)")
     dst_path = os.path.join(str(dst_dir), str(key_year), str(month))
-    cmd = RSYNC_CMD_TEMPLATE.format(src_file=src_file, dst_path=dst_path)
     cmd_args = ['rsync', '-zvh', '--progress', src_file, dst_path]
 
-    logger.info(cmd_args)
-        
+    logger.info('Running rsync: %s -> %s', src_file, dst_path)
+    logger.debug('Rsync command: %s', cmd_args)
 
     output = run_command(cmd_args)
 
     if output:
-        print("Command output:")
-        print(output)
+        logger.debug('Rsync output:\n%s', output.strip())
 
- 
+
 def copy_date_month(month: str, src_dir: str, dst_dir: str, key_year: str):
     """
     Copy files matching specific patterns from the source directory to the destination directory.
@@ -125,6 +115,14 @@ def copy_date_month(month: str, src_dir: str, dst_dir: str, key_year: str):
 
     logger.info(f'\n * Copying files from {src_dir} to {month_dst_dir}')
     matching_files = find_matching_files(src_dir, key_year, formatted_month)
+    logger.info('Found %d matching file(s)', len(matching_files))
 
-    for file in matching_files:
+    if not matching_files:
+        logger.warning('No files matched patterns for %s-%s in %s', key_year, formatted_month, src_dir)
+        return
+
+    for index, file in enumerate(matching_files, start=1):
+        logger.debug('Copying file %d/%d: %s', index, len(matching_files), file)
         execute_rsync(file, dst_dir, key_year, formatted_month)
+
+    logger.info('Finished copying %d file(s)', len(matching_files))
